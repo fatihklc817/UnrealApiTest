@@ -31,11 +31,22 @@ void UAPIGameInstanceSubsystem::OnResponseReceived(FHttpRequestPtr Request, FHtt
 	FString ResponseStr = Response->GetContentAsString();
 	int32 ResponseCode = Response->GetResponseCode();
 
-	UE_LOG(LogTemp, Warning, TEXT("Response: %s and Response code : %d"), *ResponseStr, ResponseCode);
+	FString URL = Request->GetURL();
+	FString Time = FDateTime::Now().ToString(TEXT("%Y-%m-%d %H:%M:%S"));
 
-	//save to pc
+	FString OutputString = FString::Printf(TEXT("[%s] URL: %s | Code:%d | Body:%s \n"),*Time, *URL, ResponseCode, *ResponseStr);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Response: %s and Response code : %d"), *ResponseStr, ResponseCode);
+
 	FString FilePath = FPaths::ProjectDir() / TEXT("SavedJsons/Images.txt");
-	bool bSaved = FFileHelper::SaveStringToFile(ResponseStr, *FilePath);
+
+	//----------------------------------------------------------------------save to pc as a text file / if it already has override 
+	//bool bSaved = FFileHelper::SaveStringToFile(ResponseStr, *FilePath);
+
+	//-----------------------------------------------------------------------add the string to already created txt file 
+	bool bSaved = FFileHelper::SaveStringToFile(OutputString, *FilePath, FFileHelper::EEncodingOptions::AutoDetect,&IFileManager::Get(),FILEWRITE_Append);
+
+	
 	
 	
 	TArray<FRequestedImage> OutImages;
